@@ -1,4 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -49,7 +52,7 @@ Provide the response in the following JSON format:
   try {
     const message = await client.messages.create({
       model: "claude-opus-4-6",
-      max_tokens: 4000,
+      max_tokens: 8000,
       messages: [
         {
           role: "user",
@@ -58,10 +61,11 @@ Provide the response in the following JSON format:
       ],
     });
 
-    // Парсим JSON из ответа
     const responseText = message.content[0].text;
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    return JSON.parse(jsonMatch[0]);
+    const start = responseText.indexOf("{");
+    const end = responseText.lastIndexOf("}");
+    if (start === -1 || end === -1) throw new Error("No JSON found in response");
+    return JSON.parse(responseText.slice(start, end + 1));
   } catch (error) {
     console.error("Claude API error:", error);
     throw error;
@@ -105,11 +109,11 @@ Provide engaging descriptions for each day and activity.`;
 export async function getRestaurantRecommendations(city, cuisine, budget) {
   const message = await client.messages.create({
     model: "claude-opus-4-6",
-    max_tokens: 1500,
+    max_tokens: 3000,
     messages: [
       {
         role: "user",
-        content: `Recommend 5 best ${cuisine} restaurants in ${city} within $${budget} budget per person. 
+        content: `Recommend 5 best ${cuisine} restaurants in ${city} within $${budget} budget per person.
         Include: name, estimated cost, address, specialty dish, why to visit.
         Format as JSON array.`,
       },
@@ -117,6 +121,8 @@ export async function getRestaurantRecommendations(city, cuisine, budget) {
   });
 
   const responseText = message.content[0].text;
-  const jsonMatch = responseText.match(/\[[\s\S]*\]/);
-  return JSON.parse(jsonMatch[0]);
+  const start = responseText.indexOf("[");
+  const end = responseText.lastIndexOf("]");
+  if (start === -1 || end === -1) throw new Error("No JSON array found in response");
+  return JSON.parse(responseText.slice(start, end + 1));
 }
