@@ -38,11 +38,17 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   flex: 1;
+  width: 100%;
 }
 
 .loading {
@@ -77,4 +83,70 @@ body {
   border-radius: 8px;
   margin: 1rem 0;
   border-left: 4px solid #d32f2f;
+}
+
+.conversation-section {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.conversation-section h2 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.ready-for-plan {
+  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.ready-for-plan p {
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.completed-section {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.new-plan-btn {
+  margin-bottom: 2rem;
+  padding: 0.75rem 1.5rem;
+  background: #f0f0f0;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.new-plan-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .container {
+    padding: 1rem;
+  }
 }

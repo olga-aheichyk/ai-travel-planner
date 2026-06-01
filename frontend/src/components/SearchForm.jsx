@@ -7,34 +7,7 @@ export function SearchForm({ onSearch, loading }) {
     country: "",
     days: 3,
     budget: 1000,
-    interests: [],
-    travelStyle: "balanced",
   });
-
-  const interests = [
-    "Culture",
-    "Nature",
-    "Food",
-    "Adventure",
-    "Shopping",
-    "Nightlife",
-  ];
-  const travelStyles = [
-    "budget",
-    "balanced",
-    "luxury",
-    "adventure",
-    "cultural",
-  ];
-
-  const handleInterestChange = (interest) => {
-    setFormData((prev) => ({
-      ...prev,
-      interests: prev.interests.includes(interest)
-        ? prev.interests.filter((i) => i !== interest)
-        : [...prev.interests, interest],
-    }));
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,6 +18,8 @@ export function SearchForm({ onSearch, loading }) {
 
   return (
     <form onSubmit={handleSubmit} className="search-form">
+      <h2>Start Your Journey 🌍</h2>
+
       <div className="form-group">
         <label>City</label>
         <input
@@ -52,6 +27,7 @@ export function SearchForm({ onSearch, loading }) {
           value={formData.city}
           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
           placeholder="e.g., Barcelona"
+          required
         />
       </div>
 
@@ -64,6 +40,7 @@ export function SearchForm({ onSearch, loading }) {
             setFormData({ ...formData, country: e.target.value })
           }
           placeholder="e.g., Spain"
+          required
         />
       </div>
 
@@ -95,41 +72,13 @@ export function SearchForm({ onSearch, loading }) {
         </div>
       </div>
 
-      <div className="form-group">
-        <label>Travel Style</label>
-        <select
-          value={formData.travelStyle}
-          onChange={(e) =>
-            setFormData({ ...formData, travelStyle: e.target.value })
-          }
-        >
-          {travelStyles.map((style) => (
-            <option key={style} value={style}>
-              {style.charAt(0).toUpperCase() + style.slice(1)}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>Interests</label>
-        <div className="interests-grid">
-          {interests.map((interest) => (
-            <label key={interest} className="checkbox-label">
-              <input
-                type="checkbox"
-                checked={formData.interests.includes(interest)}
-                onChange={() => handleInterestChange(interest)}
-              />
-              {interest}
-            </label>
-          ))}
-        </div>
-      </div>
-
       <button type="submit" disabled={loading} className="submit-btn">
-        {loading ? "Creating your itinerary..." : "Generate Itinerary"}
+        {loading ? "Starting conversation..." : "Start Planning"}
       </button>
+
+      <p className="form-hint">
+        💡 Next, answer a few questions to personalize your itinerary
+      </p>
     </form>
   );
 }

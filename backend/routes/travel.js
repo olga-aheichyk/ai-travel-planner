@@ -3,6 +3,10 @@ import {
   generateTravelPlan,
   getRestaurantRecommendations,
   streamTravelPlanChunks,
+  createConversation,
+  getConversation,
+  continueConversation,
+  finalizeConversationPlan,
 } from "../services/claudeService.js";
 
 const router = express.Router();
@@ -49,6 +53,50 @@ router.post("/restaurants", async (req, res) => {
       budget,
     );
     res.json(recommendations);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/travel/conversation/init
+router.post("/conversation/init", async (req, res) => {
+  try {
+    const initialRequest = req.body; // { city, country, days, budget }
+    const id = createConversation(initialRequest);
+
+    const { city, country, days, budget } = initialRequest;
+    const firstMessage = await continueConversation(id, `I want to plan a ${days}-day trip to ${city}, ${country} with a budget of $${budget}.`);
+
+    res.json({ conversationId: id, assistantMessage: firstMessage.assistantMessage });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/travel/conversation/:id/message
+router.post("/conversation/:id/message", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userMessage } = req.body;
+
+    if (!getConversation(id)) return res.status(404).json({ error: "Conversation not found" });
+
+    const result = await continueConversation(id, userMessage);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/travel/conversation/:id/finalize
+router.post("/conversation/:id/finalize", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!getConversation(id)) return res.status(404).json({ error: "Conversation not found" });
+
+    const plan = await finalizeConversationPlan(id);
+    res.json(plan);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
