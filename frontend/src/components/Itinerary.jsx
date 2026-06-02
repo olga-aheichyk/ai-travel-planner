@@ -1,3 +1,4 @@
+import { GoogleMapComponent } from "./GoogleMap";
 import "../styles/Itinerary.css";
 
 export function Itinerary({ plan }) {
@@ -14,6 +15,8 @@ export function Itinerary({ plan }) {
           <p>{plan.personalizationNote}</p>
         </div>
       )}
+
+      <GoogleMapComponent plan={plan} />
 
       <div className="summary-stats">
         <div className="stat">

@@ -231,7 +231,6 @@ export async function generateFinalPlan(conversationId) {
 
   const { initialRequest, messages } = conversation;
 
-  // Извлекаем всю историю диалога для контекста
   const conversationHistory = messages
     .map(
       (msg) =>
@@ -266,8 +265,8 @@ ${conversationHistory}
 - Create a ${initialRequest.days}-day itinerary that reflects ALL preferences mentioned in the conversation
 - Include specific times for activities (HH:MM format)
 - Estimate realistic costs for each activity
-- Personalize recommendations based on what the traveler told you
 - Ensure total cost matches approximately the budget provided
+- For each activity location, use SPECIFIC place names (not just "park" but "Central Park" or neighborhood)
 - Include restaurant recommendations that match their dining preferences
 - Add local tips, packing tips, and safety tips relevant to their interests
 </requirements>
@@ -278,6 +277,10 @@ Return ONLY valid JSON (no markdown, no extra text). Use this exact structure:
 {
   "title": "string - catchy, personalized title reflecting their travel style",
   "overview": "string - 2-3 sentence summary of the itinerary",
+  "destination": {
+    "city": "${initialRequest.city}",
+    "country": "${initialRequest.country}"
+  },
   "personalizationNote": "string - explain why this plan specifically matches their stated preferences",
   "dailyItinerary": [
     {
@@ -287,7 +290,7 @@ Return ONLY valid JSON (no markdown, no extra text). Use this exact structure:
         {
           "time": "string (HH:MM format)",
           "activity": "string - activity name",
-          "location": "string - specific location/neighborhood",
+          "location": "string - SPECIFIC location name (neighborhood, landmark, street)",
           "estimatedCost": number,
           "description": "string - detailed description",
           "whyIncluded": "string - explain why based on their preferences"
@@ -322,6 +325,7 @@ Return ONLY valid JSON (no markdown, no extra text). Use this exact structure:
 You are an expert travel planner with 20+ years of experience creating personalized itineraries.
 Your strength is understanding traveler preferences and creating detailed, realistic plans.
 Always prioritize traveler preferences over generic recommendations.
+When recommending locations, always use SPECIFIC place names that can be found on maps.
 </assistant_role>`,
       messages: [
         ...messages,
@@ -333,16 +337,14 @@ Always prioritize traveler preferences over generic recommendations.
     });
 
     const responseText = response.content[0].text;
-
-    // Parse JSON
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+
     if (!jsonMatch) {
       throw new Error("Could not parse JSON from response");
     }
 
     const plan = JSON.parse(jsonMatch[0]);
 
-    // Update conversation status
     conversation.metadata.stage = "completed";
     conversation.metadata.completedAt = new Date();
     conversationStore.set(conversationId, conversation);
